@@ -64,7 +64,8 @@
             { lib, ... }:
             {
               virtualisation.qemu.package = lib.mkForce qemuPackage;
-              virtualisation.memorySize = 1024;
+              virtualisation.memorySize = 16 * 1024;
+              virtualisation.cores = 32;
               boot.kernelPackages = linuxPackages;
               systemd.tmpfiles.rules = [
                 "w /sys/kernel/mm/transparent_hugepage/shmem_enabled - - - - advise"
