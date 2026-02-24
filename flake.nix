@@ -26,20 +26,33 @@
           };
         };
       };
+      linux_6_18 = pkgs.linux_6_18;
       linuxPackages_6_17 = pkgs.linuxPackagesFor linux_6_17;
+      linuxPackages_6_18 = pkgs.linuxPackages_6_18;
+
+      qemu_10_2_0 = pkgs.qemu_kvm.overrideAttrs (_oldAttrs:  {
+        version = "10.2.0";
+        src = pkgs.fetchurl {
+          url = "https://download.qemu.org/qemu-10.2.0.tar.xz";
+          hash = "sha256-njCtG4ufe0RjABWC0aspfznPzOpdCFQMDKbWZyeFiDo=";
+        };
+      });
+      qemu_10_2_1 = pkgs.qemu_kvm;
 
       inherit (self.packages.${system}) thp-madv-remove-test;
 
-      # A function that returns a NixOS test that spawns a VM booting the given Linux kernel,
+      # A function that returns a NixOS test that spawns a VM
+      # run via the given QEMU package and booting the given Linux kernel,
       # then runs the thp-madv-remove-test binary inside the VM
       # to check for the presence of the regression.
-      test = linuxPackages: pkgs.testers.nixosTest {
+      test = qemuPackage: linuxPackages: pkgs.testers.nixosTest {
         name = "thp-madv-remove-test";
 
-        nodes.machine = {
+        nodes.machine = { lib, ... }: {
+          virtualisation.memorySize = 16 * 1024;
+          virtualisation.qemu.package = lib.mkForce qemuPackage;
           boot.kernelPackages = linuxPackages;
           environment.systemPackages = [thp-madv-remove-test];
-          virtualisation.memorySize = 16 * 1024;
         };
 
         testScript = ''
@@ -59,7 +72,7 @@
       };
 
       packages.${system} = {
-        inherit linux_6_17;
+        inherit linux_6_17 linux_6_18 qemu_10_2_0 qemu_10_2_1;
 
         thp-madv-remove-test = pkgs.rustPlatform.buildRustPackage {
           pname = "thp-madv-remove-test";
@@ -78,10 +91,11 @@
         default = thp-madv-remove-test;
       };
 
-      # Run these tests like: `nix build .#checks.x86_64-linux.test_6_17 -L`
       checks.${system} = {
-        test_6_17 = test      linuxPackages_6_17;
-        test_6_18 = test pkgs.linuxPackages_6_18;
+        test_qemu_10_2_0_kernel_6_17 = test qemu_10_2_0 linuxPackages_6_17;
+        test_qemu_10_2_0_kernel_6_18 = test qemu_10_2_0 linuxPackages_6_18;
+        test_qemu_10_2_1_kernel_6_17 = test qemu_10_2_1 linuxPackages_6_17;
+        test_qemu_10_2_1_kernel_6_18 = test qemu_10_2_1 linuxPackages_6_18;
       };
     };
 }
