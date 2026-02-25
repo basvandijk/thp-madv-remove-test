@@ -64,11 +64,24 @@
         in
         if m == null then "" else builtins.head m;
 
-      linux_HEAD = pkgs.buildLinux {
-        version = "${var "VERSION"}.${var "PATCHLEVEL"}.${var "SUBLEVEL"}${var "EXTRAVERSION"}";
-        src = ./linux;
-        ignoreConfigErrors = true;
+      # linux_HEAD = pkgs.buildLinux {
+      #   version = "${var "VERSION"}.${var "PATCHLEVEL"}.${var "SUBLEVEL"}${var "EXTRAVERSION"}";
+      #   src = ./linux;
+      #   ignoreConfigErrors = true;
+      # };
+
+      linux_HEAD = pkgs.linux_6_12.override {
+        argsOverride = rec {
+          version = "${var "VERSION"}.${var "PATCHLEVEL"}.${var "SUBLEVEL"}${var "EXTRAVERSION"}";
+          modDirVersion = version;
+          src = ./linux;
+          ignoreConfigErrors = true;
+          structuredExtraConfig = with pkgs.lib.kernel; {
+            RUST = pkgs.lib.mkForce no;
+          };
+        };
       };
+
 
       linuxPackages_6_12_74 = pkgs.linuxKernel.packages.linux_6_12;
       linuxPackages_6_17_0 = pkgs.linuxPackagesFor linux_6_17_0;
