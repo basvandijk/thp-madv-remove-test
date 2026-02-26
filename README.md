@@ -27,6 +27,13 @@ $ nix build .#checks.x86_64-linux.test_kernel_6_14_first_bad_7460b470a131 -L 2>&
 
 Log: [`test_kernel_6_14_first_bad_7460b470a131.log`](./test_kernel_6_14_first_bad_7460b470a131.log)
 
+To get the kernel config use:
+```
+nix build .#linux_6_14_first_bad_7460b470a131.configfile -o kernel.config
+```
+
+[`kernel.config`](./kernel.config)
+
 The test succeeded on its parent commit and can be reproduced with:
 
 ```
