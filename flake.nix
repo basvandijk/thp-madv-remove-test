@@ -2,7 +2,7 @@
   description = "Reproducible madv kernel regression test";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/release-24.05";
+    nixpkgs.url = "github:nixos/nixpkgs";
 
     # Source of the last good Linux kernel (parent of the first bad kernel below):
     linux_6_14_last_good_4b94c18d1519_src = {
@@ -10,7 +10,6 @@
       flake = false;
     };
     # Source of the first bad Linux kernel:
-    # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7460b470a131f985a70302a322617121efdd7caa
     linux_6_14_first_bad_7460b470a131_src = {
       url = "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot/linux-7460b470a131f985a70302a322617121efdd7caa.tar.gz";
       flake = false;
@@ -88,7 +87,7 @@
             { lib, ... }:
             {
               virtualisation.memorySize = 1024; # 1 GiB of RAM.
-              virtualisation.cores = 4; # You need more than 1 virtual core to trigger the regression reliably.
+              virtualisation.cores = 16; # You need multiple virtual cores to trigger the regression reliably.
               boot.kernelPackages = linuxPackages;
               systemd.tmpfiles.rules = [
                 "w /sys/kernel/mm/transparent_hugepage/shmem_enabled - - - - advise"
