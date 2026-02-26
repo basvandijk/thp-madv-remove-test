@@ -87,8 +87,8 @@
           nodes.machine =
             { lib, ... }:
             {
-              virtualisation.memorySize = 16 * 1024;
-              virtualisation.cores = 32;
+              virtualisation.memorySize = 1024; # 1 GiB of RAM.
+              virtualisation.cores = 4; # You need more than 1 virtual core to trigger the regression reliably.
               boot.kernelPackages = linuxPackages;
               systemd.tmpfiles.rules = [
                 "w /sys/kernel/mm/transparent_hugepage/shmem_enabled - - - - advise"

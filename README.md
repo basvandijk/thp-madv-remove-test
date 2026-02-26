@@ -1,10 +1,18 @@
-Minimal reproducer for a kernel regression where
-`madvise(MADV_REMOVE)` on a 4KiB range within a huge-page-backed
-`MAP_SHARED` memfd region corrupts nearby pages.
+# Kernel Regression
+Minimal reproducer for a kernel regression where `madvise(MADV_REMOVE)` on a 4KiB range
+within a huge-page-backed `MAP_SHARED` memfd region corrupts nearby pages.
 
-The test runs a VM booting the specified kernel, then waits for the system to boot and reach target `multi-user.target`, then runs the Rust binary `thp-madv-remove-test` to check for the presence of the regression.
+The test runs a VM booting the specified kernel,
+then waits for the system to boot and reach target `multi-user.target`,
+then runs the Rust binary `thp-madv-remove-test` which creates a memfd and forks.
+The child maps the file, fills all pages with known patterns, applies `MADV_HUGEPAGE`,
+and then continuously verifies non-punched pages.
 
-The regression first happened on kernel 6.14 on [7460b470a131](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7460b470a131f985a70302a322617121efdd7caa) and can be reproduced with:
+
+# Results
+The regression first happened on kernel 6.14 on
+[7460b470a131](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7460b470a131f985a70302a322617121efdd7caa)
+and can be reproduced with:
 
 ```
 $ nix build .#checks.x86_64-linux.test_kernel_6_14_first_bad_7460b470a131 -L
