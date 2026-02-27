@@ -57,3 +57,7 @@ To test the kernel in the git submodule under `./linux` use:
 ```
 nix build git+file:.?submodules=1#checks.x86_64-linux.test_kernel_HEAD -L
 ```
+
+# Thanks
+
+Thanks to Adam Bratschi-Kaye for writing the `thp-madv-remove-test` Rust binary for detecting the kernel regression!
