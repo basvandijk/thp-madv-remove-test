@@ -1,4 +1,6 @@
 # Kernel Regression
+[Thread on linux-mm](https://lore.kernel.org/linux-mm/CAKNNEtw5_kZomhkugedKMPOG-sxs5Q5OLumWJdiWXv+C9Yct0w@mail.gmail.com/T/#u).
+
 Minimal reproducer for a kernel regression where `madvise(MADV_REMOVE)` on a 4KiB range
 within a huge-page-backed `MAP_SHARED` memfd region corrupts nearby pages.
 
